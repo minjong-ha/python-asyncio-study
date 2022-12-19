@@ -6,6 +6,14 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from ShihTzu import main
 
-asyncio.run(main.run())
+if __name__ == "__main__":
+
+    app = main.ShihTzu()
+    app.run()
+    sys.exit(app.exit_code)
+
+    
+
+
 
 
