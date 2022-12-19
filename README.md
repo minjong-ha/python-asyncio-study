@@ -28,6 +28,11 @@ With "rx", developers can handle asynchronous data streams with __observables__.
 
 "pytest" provides the library for unit test.
 
+# Shih-Tzu: Sample application
+
+For better understanding, this repository provides "Shih-Tzu" application that working like a puppy.
+You can create a Shih-Tzu object, execute command for it, and handle state changes for it.
+It will run with asyncio and RxPY.
 
 # How to run?
 
@@ -37,3 +42,6 @@ Execute the script "run"
 ./run
 ```
 
+### Thanks to
+
+Poppi, Toto, Tori.
