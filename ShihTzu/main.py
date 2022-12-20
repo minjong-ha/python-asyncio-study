@@ -1,11 +1,12 @@
 import asyncio
-import sys
 import os
 
-from ShihTzu.modules.dbus import Interact
+from ShihTzu.modules.controller import dbus_publish
+
 
 from .utils import logger
 from .modules import *
+from .modules.models.shihtzu import ShihTzu
 
 _logger = logger.get_logger(os.path.basename(__file__))
 
@@ -19,46 +20,32 @@ async def return_value_async():
     return True
 
 
-class ShihTzu:
-    def __init__(self):
-        self.name = None
-        self.age = None
-        self.status = None
+def _handle_exception(self, loop, context):
+    _logger.error(f"Exception: {context}")
 
-        self.exit_code = None
+    exception = context.get("exception")
+    if exception:
+        _logger.error(f"Exception Info: {exception}")
 
-    def _handle_exception(self, loop, context):
-        _logger.error(f"Exception: {context}")
+    loop.stop()
+    self.exit_code = os.EX_SOFTWARE
 
-        exception = context.get("exception")
-        if exception:
-            _logger.error(f"Exception Info: {exception}")
+def run():
+    loop = asyncio.get_event_loop() 
+    loop.set_exception_handler(_handle_exception)
 
-        loop.stop()
-        self.exit_code = os.EX_SOFTWARE
+    # Create ShihTzu objects and make them run()
+    poppi = ShihTzu("poppi", 12)
+    toto = ShihTzu("toto", 10)
 
-    async def prepare(self, _name: str, _age: int):
-        self.name = _name
-        self.age = _age
-        self.status = None
+    loop.create_task(toto.run())
+    loop.create_task(poppi.run())
 
-        # assign dbus-interface(user) for socket income
-        self._interact_dbus_interface = Interact()
-        await self._interact_dbus_interface.dbus_publish()
+    # Assign dbus-interface for ShihTzu objects
+    controllers = list()
+    controllers.append(toto.controller)
+    controllers.append(poppi.controller)
 
-        _logger.info("prepare() complete")
+    loop.create_task(dbus_publish(controllers))
 
-        return await return_value_async()
-
-    def run(self):
-        # Only a single event loop is allowed in the entire application.
-        self.loop = asyncio.get_event_loop()
-        self.loop.set_exception_handler(self._handle_exception)
-        self.loop.create_task(self.prepare("poppi", 5))
-
-        # Before the self.loop.run_forever(), assign all tasks that application requires
-        # If one of the task call loop.stop(), the event loop will be closed.
-        self.loop.run_forever()
-
-
-    
+    loop.run_forever()

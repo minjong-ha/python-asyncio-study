@@ -8,9 +8,8 @@ from ShihTzu import main
 
 if __name__ == "__main__":
 
-    app = main.ShihTzu()
+    app = main
     app.run()
-    sys.exit(app.exit_code)
 
     
 
